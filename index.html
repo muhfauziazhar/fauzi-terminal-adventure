@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>fauzi@terminal:~$</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--text:#e2e8f0;--cyan:#22d3ee;--red:#f87171;--blue:#60a5fa;--green:#4ade80;--dim:#475569;--glow:rgba(34,211,238,0.15);--prompt-color:#22d3ee}
+@font-face{font-family:'Mono';src:local('SF Mono'),local('Fira Code'),local('JetBrains Mono'),local('Consolas'),local('monospace')}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'SF Mono','Fira Code','JetBrains Mono',Consolas,'Courier New',monospace;font-size:14px;line-height:1.6;overflow:hidden}
+#terminal-wrapper{display:flex;flex-direction:column;height:100%;max-width:900px;margin:0 auto;padding:12px}
+#terminal-header{padding:8px 0;border-bottom:1px solid #1e293b;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.dot{width:12px;height:12px;border-radius:50%}
+.dot.r{background:#f87171}.dot.y{background:#fbbf24}.dot.g{background:#4ade80}
+#terminal-header span{color:var(--dim);font-size:12px;margin-left:8px}
+#output{flex:1;overflow-y:auto;padding:8px 0;scroll-behavior:smooth;word-break:break-word}
+#output::-webkit-scrollbar{width:4px}
+#output::-webkit-scrollbar-thumb{background:#334155;border-radius:4px}
+.line{margin-bottom:2px;white-space:pre-wrap}
+.line.cmd-line .prompt{color:var(--prompt-color);margin-right:4px}
+.line.cmd-line .cmd-text{color:var(--text)}
+.cyan{color:var(--cyan)}.red{color:var(--red)}.blue{color:var(--blue)}.green{color:var(--green)}.dim{color:var(--dim)}
+a,.blue{color:var(--blue);text-decoration:none;cursor:pointer}
+a:hover{text-decoration:underline}
+.project-link{color:var(--blue);cursor:pointer;text-decoration:underline}
+.project-item{cursor:pointer;padding:2px 4px;border-radius:3px;transition:background .15s}
+.project-item:hover{background:rgba(34,211,238,0.1)}
+.badge{display:inline-block;padding:1px 8px;border-radius:4px;background:rgba(34,211,238,0.15);color:var(--cyan);font-size:12px;margin:2px 2px;border:1px solid rgba(34,211,238,0.3)}
+#input-area{display:flex;align-items:center;padding:8px 0;border-top:1px solid #1e293b;margin-top:4px;gap:0}
+#prompt{color:var(--prompt-color);white-space:nowrap;margin-right:4px}
+#input{flex:1;background:transparent;border:none;outline:none;color:var(--text);font-family:inherit;font-size:14px;caret-color:var(--cyan)}
+#mobile-cmds{display:none;grid-template-columns:repeat(3,1fr);gap:6px;padding:10px 0}
+#mobile-cmds button{background:#1e293b;border:1px solid #334155;color:var(--cyan);padding:8px 4px;border-radius:6px;font-family:inherit;font-size:12px;cursor:pointer;transition:all .15s}
+#mobile-cmds button:active{background:rgba(34,211,238,0.2);transform:scale(0.96)}
+#sound-toggle{position:fixed;top:10px;right:10px;background:#1e293b;border:1px solid #334155;color:var(--dim);padding:4px 10px;border-radius:6px;font-family:inherit;font-size:12px;cursor:pointer;z-index:100}
+#sound-toggle:hover{color:var(--cyan)}
+.glow{box-shadow:0 0 40px var(--glow),0 0 80px rgba(34,211,238,0.05);border:1px solid rgba(34,211,238,0.1);border-radius:8px;padding:16px;height:100%}
+#matrix-canvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999}
+@media(max-width:768px){
+  #mobile-cmds{display:grid}
+  html,body{font-size:13px}
+  .glow{padding:8px;border-radius:0;box-shadow:none;border:none}
+}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.blink{animation:blink 1s step-end infinite}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn .2s ease-out}
+</style>
+</head>
+<body>
+<div id="terminal-wrapper">
+<div class="glow">
+<div id="terminal-header">
+<div class="dot r"></div><div class="dot y"></div><div class="dot g"></div>
+<span>fauzi@terminal — bash</span>
+</div>
+<div id="output"></div>
+<div id="input-area">
+<span id="prompt">fauzi@terminal:~$</span>
+<input type="text" id="input" autofocus autocomplete="off" spellcheck="false">
+</div>
+<div id="mobile-cmds">
+<button onclick="runCmd('help')">help</button>
+<button onclick="runCmd('about')">about</button>
+<button onclick="runCmd('skills')">skills</button>
+<button onclick="runCmd('projects')">projects</button>
+<button onclick="runCmd('career')">career</button>
+<button onclick="runCmd('certs')">certs</button>
+<button onclick="runCmd('contact')">contact</button>
+<button onclick="runCmd('theme')">theme</button>
+<button onclick="runCmd('clear')">clear</button>
+</div>
+</div>
+</div>
+<button id="sound-toggle" onclick="toggleSound()">🔇 sound</button>
+<canvas id="matrix-canvas"></canvas>
+<script>
+const output=document.getElementById('output'),input=document.getElementById('input');
+const history=[];let histIdx=-1,soundOn=false,typing=false;
+const themes={
+  green:{cyan:'#4ade80',glow:'rgba(74,222,128,0.15)',prompt:'#4ade80'},
+  cyan:{cyan:'#22d3ee',glow:'rgba(34,211,238,0.15)',prompt:'#22d3ee'},
+  blue:{cyan:'#60a5fa',glow:'rgba(96,165,250,0.15)',prompt:'#60a5fa'}
+};
+let currentTheme='cyan';
+const allCmds=['help','about','skills','projects','career','certs','contact','theme','clear','sudo hire-me','matrix','coffee','open'];
+
+// Audio context for click sound
+let audioCtx;
+function playClick(){
+  if(!soundOn)return;
+  try{
+    if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+    o.connect(g);g.connect(audioCtx.destination);
+    o.frequency.value=800+Math.random()*400;g.gain.value=0.03;
+    o.start();g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+0.05);
+    o.stop(audioCtx.currentTime+0.05);
+  }catch(e){}
+}
+function toggleSound(){
+  soundOn=!soundOn;
+  document.getElementById('sound-toggle').textContent=soundOn?'🔊 sound':'🔇 sound';
+}
+
+function print(html,cls=''){
+  const d=document.createElement('div');
+  d.className='line fade-in'+(cls?' '+cls:'');
+  d.innerHTML=html;
+  output.appendChild(d);
+  output.scrollTop=output.scrollHeight;
+}
+function printRaw(text,cls=''){print(esc(text),cls);}
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+async function typePrint(text,speed=12){
+  typing=true;
+  const d=document.createElement('div');d.className='line fade-in';
+  output.appendChild(d);
+  for(let i=0;i<text.length;i++){
+    d.innerHTML=esc(text.substring(0,i+1));
+    output.scrollTop=output.scrollHeight;
+    await sleep(speed);
+  }
+  typing=false;
+}
+function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
+
+function printPrompt(cmd){
+  print(`<span class="prompt">fauzi@terminal:~$</span> <span class="cmd-text">${esc(cmd)}</span>`,'cmd-line');
+}
+
+// PROJECTS DATA
+const projects={
+  'warung-kasir':{
+    name:'warung-kasir',desc:'Multi-tenant Point of Sale (POS) SaaS for small businesses in Indonesia. Features inventory management, sales tracking, receipt printing, and multi-outlet support.',
+    stack:['Next.js','TypeScript','PostgreSQL','Prisma','Tailwind','Vercel'],
+    link:'https://warkas.my.id',ascii:`
+ ██╗    ██╗ █████╗ ██████╗ ██╗  ██╗██╗   ██╗███╗   ██╗ ██████╗ 
+ ██║    ██║██╔══██╗██╔══██╗██║ ██╔╝██║   ██║████╗  ██║██╔════╝ 
+ ██║ █╗ ██║███████║██████╔╝█████╔╝ ██║   ██║██╔██╗ ██║██║  ███╗
+ ██║███╗██║██╔══██║██╔══██╗██╔═██╗ ██║   ██║██║╚██╗██║██║   ██║
+ ╚███╔███╔╝██║  ██║██║  ██║██║  ██╗╚██████╔╝██║ ╚████║╚██████╔╝
+  ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝`
+  },
+  'nusakit':{
+    name:'nusakit',desc:'NPM toolkit for Indonesian data validation — validate NIK, NPWP, NBP, and other Indonesian identity numbers with ease.',
+    stack:['TypeScript','NPM','Node.js','Jest'],
+    link:'https://www.npmjs.com/package/nusakit',ascii:`
+ ███╗   ██╗██╗   ██╗███████╗ █████╗ ██╗  ██╗██╗████████╗
+ ████╗  ██║██║   ██║██╔════╝██╔══██╗██║ ██╔╝██║╚══██╔══╝
+ ██╔██╗ ██║██║   ██║███████╗███████║█████╔╝ ██║   ██║   
+ ██║╚██╗██║██║   ██║╚════██║██╔══██║██╔═██╗ ██║   ██║   
+ ██║ ╚████║╚██████╔╝███████║██║  ██║██║  ██╗██║   ██║   
+ ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝   ╚═╝   `
+  },
+  'slack-lite':{
+    name:'slack-lite',desc:'Self-hosted team chat application with real-time messaging, channels, file sharing, and direct messages.',
+    stack:['Next.js','TypeScript','PostgreSQL','WebSocket','Docker'],
+    link:'https://github.com/muhfauziazhar/slack-lite',ascii:`
+ ███████╗██╗      █████╗  ██████╗██╗  ██╗      ██╗     ██╗████████╗███████╗
+ ██╔════╝██║     ██╔══██╗██╔════╝██║ ██╔╝      ██║     ██║╚══██╔══╝██╔════╝
+ ███████╗██║     ███████║██║     █████╔╝       ██║     ██║   ██║   █████╗  
+ ╚════██║██║     ██╔══██║██║     ██╔═██╗       ██║     ██║   ██║   ██╔══╝  
+ ███████║███████╗██║  ██║╚██████╗██║  ██╗      ███████╗██║   ██║   ███████╗
+ ╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝      ╚══════╝╚═╝   ╚═╝   ╚══════╝`
+  },
+  'tempmail':{
+    name:'tempmail',desc:'Disposable email web app — generate temporary email addresses to protect your privacy. Auto-refresh inbox, no signup required.',
+    stack:['Next.js','TypeScript','Cloudflare Workers','Tailwind'],
+    link:'https://github.com/muhfauziazhar/tempmail',ascii:`
+ ████████╗███████╗███╗   ███╗██████╗ ███╗   ███╗ █████╗ ██╗██╗     
+ ╚══██╔══╝██╔════╝████╗ ████║██╔══██╗████╗ ████║██╔══██╗██║██║     
+    ██║   █████╗  ██╔████╔██║██████╔╝██╔████╔██║███████║██║██║     
+    ██║   ██╔══╝  ██║╚██╔╝██║██╔═══╝ ██║╚██╔╝██║██╔══██║██║██║     
+    ██║   ███████╗██║ ╚═╝ ██║██║     ██║ ╚═╝ ██║██║  ██║██║███████╗
+    ╚═╝   ╚══════╝╚═╝     ╚═╝╚═╝     ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚══════╝`
+  },
+  'code-auditor':{
+    name:'code-auditor',desc:'AI-powered code review tool — automated analysis of code quality, security vulnerabilities, and best practices with AI-driven suggestions.',
+    stack:['TypeScript','OpenAI API','Next.js','PostgreSQL'],
+    link:'https://github.com/muhfauziazhar/code-auditor',ascii:`
+  ██████╗ ██████╗ ██████╗ ███████╗      █████╗ ██╗   ██╗██████╗ ██╗████████╗ ██████╗ ██████╗ 
+ ██╔════╝██╔═══██╗██╔══██╗██╔════╝     ██╔══██╗██║   ██║██╔══██╗██║╚══██╔══╝██╔═══██╗██╔══██╗
+ ██║     ██║   ██║██║  ██║█████╗      ███████║██║   ██║██║  ██║██║   ██║   ██║   ██║██████╔╝
+ ██║     ██║   ██║██║  ██║██╔══╝      ██╔══██║██║   ██║██║  ██║██║   ██║   ██║   ██║██╔══██╗
+ ╚██████╗╚██████╔╝██████╔╝███████╗     ██║  ██║╚██████╔╝██████╔╝██║   ██║   ╚██████╔╝██║  ██║
+  ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝`
+  },
+  'actuarial-copilot':{
+    name:'actuarial-copilot',desc:'AI copilot for actuarial work — assists with calculations, report generation, and data analysis for insurance and risk assessment.',
+    stack:['Python','OpenAI API','Streamlit','Pandas'],
+    link:'https://github.com/muhfauziazhar/actuarial-copilot',ascii:`
+  █████╗  ██████╗████████╗██╗   ██╗ █████╗ ██████╗ ██╗ █████╗ ██╗     
+ ██╔══██╗██╔════╝╚══██╔══╝██║   ██║██╔══██╗██╔══██╗██║██╔══██╗██║     
+ ███████║██║        ██║   ██║   ██║███████║██████╔╝██║███████║██║     
+ ██╔══██║██║        ██║   ██║   ██║██╔══██║██╔══██╗██║██╔══██║██║     
+ ██║  ██║╚██████╗   ██║   ╚██████╔╝██║  ██║██║  ██║██║██║  ██║███████╗
+ ╚═╝  ╚═╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚══════╝`
+  },
+  'rangkumanut':{
+    name:'rangkumanut',desc:'Course summaries & quizzes for Universitas Terbuka students — study materials, practice questions, and progress tracking.',
+    stack:['Next.js','TypeScript','PostgreSQL','Tailwind'],
+    link:'https://rangkumanut.fauzi.tech',ascii:`
+ ██████╗  █████╗ ███╗   ██╗ ██████╗██╗  ██╗██╗   ██╗███╗   ███╗ █████╗ ███╗   ██╗██╗   ██╗████████╗
+ ██╔══██╗██╔══██╗████╗  ██║██╔════╝██║ ██╔╝██║   ██║████╗ ████║██╔══██╗████╗  ██║██║   ██║╚══██╔══╝
+ ██████╔╝███████║██╔██╗ ██║██║     █████╔╝ ██║   ██║██╔████╔██║███████║██╔██╗ ██║██║   ██║   ██║   
+ ██╔══██╗██╔══██║██║╚██╗██║██║     ██╔═██╗ ██║   ██║██║╚██╔╝██║██╔══██║██║╚██╗██║██║   ██║   ██║   
+ ██║  ██║██║  ██║██║ ╚████║╚██████╗██║  ██╗╚██████╔╝██║ ╚═╝ ██║██║  ██║██║ ╚████║╚██████╔╝   ██║   
+ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝    ╚═╝   `
+  },
+  'link-pendek':{
+    name:'link-pendek',desc:'URL shortener — fast, minimal link shortening service with analytics and custom aliases.',
+    stack:['Next.js','TypeScript','Redis','PostgreSQL'],
+    link:'https://link.fauzi.tech',ascii:`
+ ██╗     ██╗███╗   ██╗██╗  ██╗     ██████╗ ███████╗███╗   ██╗██████╗ ███████╗██╗  ██╗
+ ██║     ██║████╗  ██║██║ ██╔╝     ██╔══██╗██╔════╝████╗  ██║██╔══██╗██╔════╝██║ ██╔╝
+ ██║     ██║██╔██╗ ██║█████╔╝      ██████╔╝█████╗  ██╔██╗ ██║██║  ██║█████╗  █████╔╝ 
+ ██║     ██║██║╚██╗██║██╔═██╗      ██╔═══╝ ██╔══╝  ██║╚██╗██║██║  ██║██╔══╝  ██╔═██╗ 
+ ███████╗██║██║ ╚████║██║  ██╗     ██║     ███████╗██║ ╚████║██████╔╝███████╗██║  ██╗
+ ╚══════╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝     ╚═╝     ╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝`
+  }
+};
+
+function switchTheme(name){
+  const t=themes[name];if(!t)return;
+  document.documentElement.style.setProperty('--cyan',t.cyan);
+  document.documentElement.style.setProperty('--glow',t.glow);
+  document.documentElement.style.setProperty('--prompt-color',t.prompt);
+  currentTheme=name;
+}
+
+const cmds={
+  help:()=>{
+    printRaw('');
+    print('<span class="cyan">╔══════════════════════════════════════╗</span>');
+    print('<span class="cyan">║</span>   <span class="cyan">COMMAND REFERENCE</span>                  <span class="cyan">║</span>');
+    print('<span class="cyan">╚══════════════════════════════════════╝</span>');
+    printRaw('');
+    const h=[
+      ['help','Show this help menu'],
+      ['about','About me'],
+      ['skills','Tech skills & tools'],
+      ['projects','List all projects'],
+      ['open &lt;name&gt;','Open project details'],
+      ['career','Work experience timeline'],
+      ['certs','Certifications'],
+      ['contact','Contact info'],
+      ['theme','Toggle terminal theme'],
+      ['clear','Clear terminal'],
+      ['',''],
+      ['sudo hire-me','???'],
+      ['matrix','???'],
+      ['coffee','???']
+    ];
+    h.forEach(([c,d])=>{
+      if(!c){printRaw('');return;}
+      print(`  <span class="cyan">${c.padEnd(18)}</span><span class="dim">${d}</span>`);
+    });
+    printRaw('');
+  },
+  about:async()=>{
+    printRaw('');
+    await typePrint('Muhammad Fauzi Azhar — Software Engineer with 3 years of experience building web applications.');
+    await typePrint('Passionate about system design, DevOps, and exploring API paradigms beyond CRUD.');
+    await typePrint('Currently exploring AI integration in software development.');
+    await typePrint('Based in Indonesia. Loves building tools that solve real problems.');
+    printRaw('');
+    print('<span class="dim">→</span> <a href="https://fauzi.tech" target="_blank">fauzi.tech</a>');
+    printRaw('');
+  },
+  skills:()=>{
+    printRaw('');
+    print('<span class="cyan">┌──────────── TECH STACK ────────────┐</span>');
+    const skills=[
+      ['Frontend','Next.js, React, TypeScript, Tailwind'],
+      ['Backend','Node.js, PostgreSQL, Prisma'],
+      ['DevOps','Docker, AWS, Linux, Git'],
+      ['Exploring','AI Integration, System Design']
+    ];
+    skills.forEach(([cat,list])=>{
+      print(`  <span class="cyan">${cat.padEnd(12)}</span> <span class="green">${list}</span>`);
+    });
+    print('<span class="cyan">└────────────────────────────────────┘</span>');
+    printRaw('');
+  },
+  projects:()=>{
+    printRaw('');
+    print('<span class="cyan">┌──────────── PROJECTS ──────────────┐</span>');
+    printRaw('');
+    Object.values(projects).forEach((p,i)=>{
+      const num=String(i+1).padStart(2,'0');
+      print(`  <span class="dim">[${num}]</span> <span class="project-item" onclick="runCmd('open ${p.name}')"><span class="cyan">${p.name}</span></span>`);
+      print(`       <span class="dim">${p.desc.split('—')[1]||p.desc}</span>`);
+      printRaw('');
+    });
+    print('<span class="dim">  Type </span><span class="cyan">open &lt;name&gt;</span><span class="dim"> to view details</span>');
+    print('<span class="cyan">└────────────────────────────────────┘</span>');
+    printRaw('');
+  },
+  career:async()=>{
+    printRaw('');
+    print('<span class="cyan">┌──────────── CAREER TIMELINE ───────┐</span>');
+    printRaw('');
+    await typePrint('  [<span class="green">2024-present</span>] Software Engineer');
+    print('               <span class="dim">Building SaaS products & AI-powered tools</span>');
+    await sleep(200);
+    await typePrint('  [<span class="green">2023-2024</span>  ] Full-Stack Developer');
+    print('               <span class="dim">Web apps for enterprise clients</span>');
+    await sleep(200);
+    await typePrint('  [<span class="green">2022-2023</span>  ] Junior Developer');
+    print('               <span class="dim">Started the journey with Next.js & React</span>');
+    printRaw('');
+    print('<span class="cyan">└────────────────────────────────────┘</span>');
+    printRaw('');
+  },
+  certs:()=>{
+    printRaw('');
+    print('<span class="cyan">┌──────────── CERTIFICATIONS ────────┐</span>');
+    printRaw('');
+    ['AWS Cloud Practitioner Essentials','Web Development (Dicoding)','Python (HackerRank)','JavaScript (HackerRank)','SQL (HackerRank)'].forEach(c=>{
+      print(`  <span class="cyan">✦</span> ${c}`);
+    });
+    printRaw('');
+    print('<span class="cyan">└────────────────────────────────────┘</span>');
+    printRaw('');
+  },
+  contact:async()=>{
+    printRaw('');
+    print('<span class="cyan">┌──────────── CONTACT ───────────────┐</span>');
+    printRaw('');
+    await typePrint('  Let\'s connect! Reach me via:');
+    printRaw('');
+    print(`  <span class="cyan">GitHub</span>    →  <a href="https://github.com/muhfauziazhar" target="_blank">github.com/muhfauziazhar</a>`);
+    print(`  <span class="cyan">LinkedIn</span>  →  <a href="https://linkedin.com/in/muhfauziazhar" target="_blank">linkedin.com/in/muhfauziazhar</a>`);
+    print(`  <span class="cyan">Website</span>   →  <a href="https://fauzi.tech" target="_blank">fauzi.tech</a>`);
+    print(`  <span class="cyan">Email</span>    →  <a href="mailto:hello@fauzi.tech">hello@fauzi.tech</a>`);
+    print(`  <span class="cyan">Telegram</span>  →  <a href="https://t.me/muhfauziazhar" target="_blank">@muhfauziazhar</a>`);
+    printRaw('');
+    print('<span class="cyan">└────────────────────────────────────┘</span>');
+    printRaw('');
+  },
+  theme:()=>{
+    const names=Object.keys(themes);
+    const idx=(names.indexOf(currentTheme)+1)%names.length;
+    switchTheme(names[idx]);
+    print(`<span class="cyan">Theme switched to: ${names[idx]}</span>`);
+  },
+  clear:()=>{output.innerHTML='';},
+  'sudo hire-me':()=>{
+    printRaw('');
+    print('<span class="green">  ╔══════════════════════════════════════════════╗</span>');
+    print('<span class="green">  ║                                              ║</span>');
+    print('<span class="green">  ║   🎉  YOU FOUND THE SECRET COMMAND!  🎉     ║</span>');
+    print('<span class="green">  ║                                              ║</span>');
+    print('<span class="green">  ║      ██████╗ ██╗   ██╗██████╗ ██╗            ║</span>');
+    print('<span class="green">  ║      ██╔══██╗██║   ██║██╔══██╗██║            ║</span>');
+    print('<span class="green">  ║      ██║  ██║██║   ██║██║  ██║██║            ║</span>');
+    print('<span class="green">  ║      ██║  ██║██║   ██║██║  ██║╚═╝            ║</span>');
+    print('<span class="green">  ║      ██████╔╝╚██████╔╝██████╔╝██╗            ║</span>');
+    print('<span class="green">  ║      ╚═════╝  ╚═════╝ ╚═════╝ ╚═╝            ║</span>');
+    print('<span class="green">  ║                                              ║</span>');
+    print('<span class="green">  ║   💼 Contact him now!                        ║</span>');
+    print('<span class="green">  ║   📧 hello@fauzi.tech                        ║</span>');
+    print('<span class="green">  ║   🌐 fauzi.tech                              ║</span>');
+    print('<span class="green">  ║                                              ║</span>');
+    print('<span class="green">  ╚══════════════════════════════════════════════╝</span>');
+    printRaw('');
+  },
+  matrix:()=>{
+    const canvas=document.getElementById('matrix-canvas');
+    const ctx=canvas.getContext('2d');
+    canvas.width=window.innerWidth;canvas.height=window.innerHeight;
+    canvas.style.display='block';
+    const cols=Math.floor(canvas.width/14);
+    const drops=Array(cols).fill(0);
+    const chars='アイウエオカキクケコサシスセソタチツテトナニヌネノ0123456789ABCDEF';
+    let frame=0;
+    const draw=()=>{
+      ctx.fillStyle='rgba(10,10,10,0.08)';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle='#22d3ee';
+      ctx.font='14px monospace';
+      for(let i=0;i<drops.length;i++){
+        const t=chars[Math.floor(Math.random()*chars.length)];
+        ctx.fillStyle=Math.random()>0.95?'#fff':'#22d3ee';
+        ctx.fillText(t,i*14,drops[i]*14);
+        if(drops[i]*14>canvas.height&&Math.random()>0.975)drops[i]=0;
+        drops[i]++;
+      }
+      frame++;
+      if(frame<80)requestAnimationFrame(draw);
+      else canvas.style.display='none';
+    };
+    draw();
+    print('<span class="green">[matrix] Wake up, Neo...</span>');
+  },
+  coffee:()=>{
+    printRaw('');
+    print('<span class="cyan">       ( (</span>');
+    print('<span class="cyan">        ) )</span>');
+    print('<span class="cyan">      ........</span>');
+    print('<span class="cyan">      |      |]</span>');
+    print('<span class="cyan">      \\      /</span>');
+    print('<span class="cyan">       `----\'</span>');
+    printRaw('');
+    print('<span class="green">  ☕ Fueled by caffeine. Always.</span>');
+    printRaw('');
+  }
+};
+
+function openProject(name){
+  const p=projects[name];
+  if(!p){
+    print(`<span class="red">Project "${esc(name)}" not found. Type </span><span class="cyan">projects</span><span class="red"> to list all.</span>`);
+    return;
+  }
+  printRaw('');
+  print(`<span class="cyan">${p.ascii}</span>`);
+  printRaw('');
+  print(`<span class="dim">${'─'.repeat(50)}</span>`);
+  printRaw('');
+  print(`  <span class="cyan">Project:</span> ${p.name}`);
+  printRaw('');
+  print(`  <span class="cyan">Description:</span>`);
+  print(`  <span class="dim">${esc(p.desc)}</span>`);
+  printRaw('');
+  print(`  <span class="cyan">Tech Stack:</span>`);
+  let badges=p.stack.map(s=>`<span class="badge">${s}</span>`).join(' ');
+  print(`  ${badges}`);
+  printRaw('');
+  print(`  <span class="cyan">Link:</span> <a href="${p.link}" target="_blank">${p.link}</a>`);
+  printRaw('');
+  print(`<span class="dim">${'─'.repeat(50)}</span>`);
+  printRaw('');
+}
+
+function processCmd(raw){
+  const cmd=raw.trim();
+  if(!cmd)return;
+  history.push(cmd);histIdx=history.length;
+  printPrompt(cmd);
+
+  if(cmd.startsWith('open ')){
+    openProject(cmd.slice(5).trim());
+    return;
+  }
+  if(cmds[cmd]){cmds[cmd]();}
+  else{
+    print(`<span class="red">Command not found: ${esc(cmd)}</span>`);
+    print(`<span class="dim">Type </span><span class="cyan">help</span><span class="dim"> for available commands.</span>`);
+  }
+}
+
+function runCmd(cmd){input.value=cmd;processCmd(cmd);input.value='';}
+
+input.addEventListener('keydown',e=>{
+  playClick();
+  if(e.key==='Enter'){processCmd(input.value);input.value='';}
+  else if(e.key==='Tab'){
+    e.preventDefault();
+    const v=input.value.trim().toLowerCase();
+    const match=allCmds.filter(c=>c.startsWith(v));
+    if(match.length===1)input.value=match[0];
+    else if(match.length>1){
+      print(`<span class="dim">${match.join('  ')}</span>`);
+    }
+  }
+  else if(e.key==='ArrowUp'){
+    e.preventDefault();
+    if(histIdx>0){histIdx--;input.value=history[histIdx];}
+  }
+  else if(e.key==='ArrowDown'){
+    e.preventDefault();
+    if(histIdx<history.length-1){histIdx++;input.value=history[histIdx];}
+    else{histIdx=history.length;input.value='';}
+  }
+});
+
+document.addEventListener('click',()=>{if(!typing)input.focus();});
+
+// BOOT SEQUENCE
+async function boot(){
+  input.disabled=true;
+  const ascii=`
+ ███╗   ███╗███████╗██╗  ██╗ █████╗ ███╗   ███╗██╗   ██╗██████╗ 
+ ████╗ ████║██╔════╝██║  ██║██╔══██╗████╗ ████║██║   ██║██╔══██╗
+ ██╔████╔██║███████╗███████║███████║██╔████╔██║██║   ██║██║  ██║
+ ██║╚██╔╝██║╚════██║██╔══██║██╔══██║██║╚██╔╝██║██║   ██║██║  ██║
+ ██║ ╚═╝ ██║███████║██║  ██║██║  ██║██║ ╚═╝ ██║╚██████╔╝██████╔╝
+ ╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝ ╚═════╝ ╚═════╝
+                      █████╗ ███████╗██╗  ██╗ █████╗ ██████╗ 
+                     ██╔══██╗╚══███╔╝██║  ██║██╔══██╗██╔══██╗
+                     ███████║  ███╔╝ ███████║███████║██████╔╝
+                     ██╔══██║ ███╔╝  ██╔══██║██╔══██║██╔══██╗
+                     ██║  ██║███████╗██║  ██║██║  ██║██║  ██║
+                     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝`;
+  for(const line of ascii.split('\n')){
+    print(`<span class="cyan">${line}</span>`);
+    await sleep(40);
+  }
+  printRaw('');
+  const bootLines=[
+    'system initializing...',
+    'loading modules ████████████ 100%',
+    'portfolio engine v3.0 loaded',
+    'type <span class="cyan">help</span> to explore'
+  ];
+  for(const l of bootLines){
+    await typePrint(l,18);
+    await sleep(150);
+  }
+  printRaw('');
+  print('<span class="dim">───────────────────────────────────────────────</span>');
+  printRaw('');
+  input.disabled=false;
+  input.focus();
+}
+
+boot();
+</script>
+</body>
+</html>
