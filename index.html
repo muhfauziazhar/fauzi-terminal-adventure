@@ -196,9 +196,9 @@ function printPrompt(cmd){
 
 // PROJECTS DATA
 const projects={
-  'warung-kasir':{
-    name:'warung-kasir',desc:'Multi-tenant Point of Sale (POS) SaaS for small businesses in Indonesia. Features inventory management, sales tracking, receipt printing, and multi-outlet support.',
-    stack:['Next.js','TypeScript','PostgreSQL','Prisma','Tailwind','Vercel'],
+  'warkas':{
+    name:'warkas',desc:'Multi-tenant POS platform for Indonesian micro-businesses (warungs, street-food vendors). Tracks sales, stock, and daily revenue. Phone-friendly, each warung gets isolated workspace with staff accounts and inventory.',
+    stack:['Next.js','TypeScript','TailwindCSS','Prisma','PostgreSQL'],
     link:'https://warkas.my.id',ascii:`
  ██╗    ██╗ █████╗ ██████╗ ██╗  ██╗██╗   ██╗███╗   ██╗ ██████╗ 
  ██║    ██║██╔══██╗██╔══██╗██║ ██╔╝██║   ██║████╗  ██║██╔════╝ 
@@ -207,42 +207,9 @@ const projects={
  ╚███╔███╔╝██║  ██║██║  ██║██║  ██╗╚██████╔╝██║ ╚████║╚██████╔╝
   ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝`
   },
-  'nusakit':{
-    name:'nusakit',desc:'NPM toolkit for Indonesian data validation — validate NIK, NPWP, NBP, and other Indonesian identity numbers with ease.',
-    stack:['TypeScript','NPM','Node.js','Jest'],
-    link:'https://www.npmjs.com/package/nusakit',ascii:`
- ███╗   ██╗██╗   ██╗███████╗ █████╗ ██╗  ██╗██╗████████╗
- ████╗  ██║██║   ██║██╔════╝██╔══██╗██║ ██╔╝██║╚══██╔══╝
- ██╔██╗ ██║██║   ██║███████╗███████║█████╔╝ ██║   ██║   
- ██║╚██╗██║██║   ██║╚════██║██╔══██║██╔═██╗ ██║   ██║   
- ██║ ╚████║╚██████╔╝███████║██║  ██║██║  ██╗██║   ██║   
- ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝   ╚═╝   `
-  },
-  'slack-lite':{
-    name:'slack-lite',desc:'Self-hosted team chat application with real-time messaging, channels, file sharing, and direct messages.',
-    stack:['Next.js','TypeScript','PostgreSQL','WebSocket','Docker'],
-    link:'https://github.com/muhfauziazhar/slack-lite',ascii:`
- ███████╗██╗      █████╗  ██████╗██╗  ██╗      ██╗     ██╗████████╗███████╗
- ██╔════╝██║     ██╔══██╗██╔════╝██║ ██╔╝      ██║     ██║╚══██╔══╝██╔════╝
- ███████╗██║     ███████║██║     █████╔╝       ██║     ██║   ██║   █████╗  
- ╚════██║██║     ██╔══██║██║     ██╔═██╗       ██║     ██║   ██║   ██╔══╝  
- ███████║███████╗██║  ██║╚██████╗██║  ██╗      ███████╗██║   ██║   ███████╗
- ╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝      ╚══════╝╚═╝   ╚═╝   ╚══════╝`
-  },
-  'tempmail':{
-    name:'tempmail',desc:'Disposable email web app — generate temporary email addresses to protect your privacy. Auto-refresh inbox, no signup required.',
-    stack:['Next.js','TypeScript','Cloudflare Workers','Tailwind'],
-    link:'https://github.com/muhfauziazhar/tempmail',ascii:`
- ████████╗███████╗███╗   ███╗██████╗ ███╗   ███╗ █████╗ ██╗██╗     
- ╚══██╔══╝██╔════╝████╗ ████║██╔══██╗████╗ ████║██╔══██╗██║██║     
-    ██║   █████╗  ██╔████╔██║██████╔╝██╔████╔██║███████║██║██║     
-    ██║   ██╔══╝  ██║╚██╔╝██║██╔═══╝ ██║╚██╔╝██║██╔══██║██║██║     
-    ██║   ███████╗██║ ╚═╝ ██║██║     ██║ ╚═╝ ██║██║  ██║██║███████╗
-    ╚═╝   ╚══════╝╚═╝     ╚═╝╚═╝     ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝╚══════╝`
-  },
   'code-auditor':{
-    name:'code-auditor',desc:'AI-powered code review tool — automated analysis of code quality, security vulnerabilities, and best practices with AI-driven suggestions.',
-    stack:['TypeScript','OpenAI API','Next.js','PostgreSQL'],
+    name:'code-auditor',desc:'LLM-assisted code review on pull requests — security issues, anti-patterns, missing error handling, code smells. A baseline second opinion for solo developers.',
+    stack:['Next.js','TypeScript','TailwindCSS','Prisma','OpenAI API'],
     link:'https://github.com/muhfauziazhar/code-auditor',ascii:`
   ██████╗ ██████╗ ██████╗ ███████╗      █████╗ ██╗   ██╗██████╗ ██╗████████╗ ██████╗ ██████╗ 
  ██╔════╝██╔═══██╗██╔══██╗██╔════╝     ██╔══██╗██║   ██║██╔══██╗██║╚══██╔══╝██╔═══██╗██╔══██╗
@@ -252,8 +219,8 @@ const projects={
   ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝`
   },
   'actuarial-copilot':{
-    name:'actuarial-copilot',desc:'AI copilot for actuarial work — assists with calculations, report generation, and data analysis for insurance and risk assessment.',
-    stack:['Python','OpenAI API','Streamlit','Pandas'],
+    name:'actuarial-copilot',desc:'AI-native research and calculation assistant — RAG over regulatory knowledge base + agent loop calling 13 production-grade domain calculators. Eval-driven development, hybrid retrieval, tool calling architecture.',
+    stack:['Next.js','TypeScript','Python','FastAPI','OpenAI API'],
     link:'https://github.com/muhfauziazhar/actuarial-copilot',ascii:`
   █████╗  ██████╗████████╗██╗   ██╗ █████╗ ██████╗ ██╗ █████╗ ██╗     ██╗
  ██╔══██╗██╔════╝╚══██╔══╝██║   ██║██╔══██╗██╔══██╗██║██╔══██╗██║     ██║
@@ -262,27 +229,60 @@ const projects={
  ██║  ██║╚██████╗   ██║   ╚██████╔╝██║  ██║██║  ██║██║██║  ██║███████╗███████╗
  ╚═╝  ╚═╝ ╚═════╝   ╚═╝    ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚══════╝╚══════╝`
   },
-  'rangkumanut':{
-    name:'rangkumanut',desc:'Course summaries & quizzes for Universitas Terbuka students — study materials, practice questions, and progress tracking.',
-    stack:['Next.js','TypeScript','PostgreSQL','Tailwind'],
-    link:'https://rangkumanut.fauzi.tech',ascii:`
- ██████╗  █████╗ ███╗   ██╗ ██████╗██╗  ██╗██╗   ██╗███╗   ███╗ █████╗ ███╗   ██╗██╗   ██╗████████╗
- ██╔══██╗██╔══██╗████╗  ██║██╔════╝██║ ██╔╝██║   ██║████╗ ████║██╔══██╗████╗  ██║██║   ██║╚══██╔══╝
- ██████╔╝███████║██╔██╗ ██║██║     █████╔╝ ██║   ██║██╔████╔██║███████║██╔██╗ ██║██║   ██║   ██║   
- ██╔══██╗██╔══██║██║╚██╗██║██║     ██╔═██╗ ██║   ██║██║╚██╔╝██║██╔══██║██║╚██╗██║██║   ██║   ██║   
- ██║  ██║██║  ██║██║ ╚████║╚██████╗██║  ██╗╚██████╔╝██║ ╚═╝ ██║██║  ██║██║ ╚████║╚██████╔╝   ██║   
- ╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═══╝ ╚═════╝    ╚═╝   `
+  'cv-ats-generator':{
+    name:'cv-ats-generator',desc:'Browser-based CV builder that scores resumes against ATS algorithms in real time. Instant feedback on keyword coverage, formatting, readability. Export as print-ready PDF. No sign-up needed.',
+    stack:['Next.js','TypeScript','TailwindCSS','Prisma'],
+    link:'https://github.com/muhfauziazhar/cv-ats-generator',ascii:`
+  ██████╗██╗   ██╗      █████╗ ████████╗███████╗      ██████╗ ███████╗███╗   ██╗
+ ██╔════╝██║   ██║     ██╔══██╗╚══██╔══╝██╔════╝     ██╔════╝ ██╔════╝████╗  ██║
+ ██║     ██║   ██║     ███████║   ██║   ███████╗     ██║  ███╗█████╗  ██╔██╗ ██║
+ ██║     ╚██╗ ██╔╝     ██╔══██║   ██║   ╚════██║     ██║   ██║██╔══╝  ██║╚██╗██║
+ ╚██████╗ ╚████╔╝      ██║  ██║   ██║   ███████║     ╚██████╔╝███████╗██║ ╚████║
+  ╚═════╝  ╚═══╝       ╚═╝  ╚═╝   ╚═╝   ╚══════╝      ╚═════╝ ╚══════╝╚═╝  ╚═══╝`
   },
-  'link-pendek':{
-    name:'link-pendek',desc:'URL shortener — fast, minimal link shortening service with analytics and custom aliases.',
-    stack:['Next.js','TypeScript','Redis','PostgreSQL'],
-    link:'https://link.fauzi.tech',ascii:`
- ██╗     ██╗███╗   ██╗██╗  ██╗     ██████╗ ███████╗███╗   ██╗██████╗ ███████╗██╗  ██╗
- ██║     ██║████╗  ██║██║ ██╔╝     ██╔══██╗██╔════╝████╗  ██║██╔══██╗██╔════╝██║ ██╔╝
- ██║     ██║██╔██╗ ██║█████╔╝      ██████╔╝█████╗  ██╔██╗ ██║██║  ██║█████╗  █████╔╝ 
- ██║     ██║██║╚██╗██║██╔═██╗      ██╔═══╝ ██╔══╝  ██║╚██╗██║██║  ██║██╔══╝  ██╔═██╗ 
- ███████╗██║██║ ╚████║██║  ██╗     ██║     ███████╗██║ ╚████║██████╔╝███████╗██║  ██╗
- ╚══════╝╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝     ╚═╝     ╚══════╝╚═╝  ╚═══╝╚═════╝ ╚══════╝╚═╝  ╚═╝`
+  'chat-widget':{
+    name:'chat-widget',desc:'Embeddable AI chat widget for any website via single script tag. Floating button, smooth animations, markdown rendering, typing indicator, mobile-responsive. OpenAI-compatible API with rate limiting.',
+    stack:['JavaScript','Rollup','Vercel Serverless','OpenAI API'],
+    link:'https://github.com/muhfauziazhar/chat-widget',ascii:`
+  ██████╗██╗  ██╗ █████╗ ████████╗      ██╗    ██╗██╗██████╗  ██████╗ ███████╗████████╗
+ ██╔════╝██║  ██║██╔══██╗╚══██╔══╝      ██║    ██║██║██╔══██╗██╔═══██╗██╔════╝╚══██╔══╝
+ ██║     ███████║███████║   ██║         ██║ █╗ ██║██║██║  ██║██║   ██║█████╗     ██║   
+ ██║     ██╔══██║██╔══██║   ██║         ██║███╗██║██║██║  ██║██║   ██║██╔══╝     ██║   
+ ╚██████╗██║  ██║██║  ██║   ██║         ╚███╔███╔╝██║██████╔╝╚██████╔╝███████╗   ██║   
+  ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝          ╚══╝╚══╝ ╚═╝╚═════╝  ╚═════╝ ╚══════╝   ╚═╝   `
+  },
+  'alya-bakery':{
+    name:'alya-bakery',desc:'Online storefront for home-bakery. Customers browse catalog, customize cake orders (size, flavor, toppings), checkout via WhatsApp deep-link. Owner dashboard tracks orders, stock, daily revenue.',
+    stack:['Next.js','TypeScript','TailwindCSS','Prisma','WhatsApp API'],
+    link:'https://github.com/muhfauziazhar/alya-bakery',ascii:`
+  █████╗ ██╗   ██╗ █████╗       ██████╗  █████╗ ██╗  ██╗███████╗██████╗ ██╗   ██╗
+ ██╔══██╗██║   ██║██╔══██╗      ██╔══██╗██╔══██╗██║ ██╔╝██╔════╝██╔══██╗╚██╗ ██╔╝
+ ███████║██║   ██║███████║      ██████╔╝███████║█████╔╝ █████╗  ██████╔╝ ╚████╔╝ 
+ ██╔══██║╚██╗ ██╔╝██╔══██║      ██╔══██╗██╔══██║██╔═██╗ ██╔══╝  ██╔══██╗  ╚██╔╝  
+ ██║  ██║ ╚████╔╝ ██║  ██║      ██████╔╝██║  ██║██║  ██╗███████╗██║  ██║   ██║   
+ ╚═╝  ╚═╝  ╚═══╝  ╚═╝  ╚═╝      ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝   ╚═╝   `
+  },
+  'kirim-wa':{
+    name:'kirim-wa',desc:'Self-hosted WhatsApp Gateway for sending messages programmatically. Multi-session support, REST API, webhook integration. Built for Indonesian businesses needing WhatsApp automation.',
+    stack:['Node.js','TypeScript','Docker','WhatsApp Web JS'],
+    link:'https://github.com/muhfauziazhar/wa-gateway-with-fe',ascii:`
+ ██╗  ██╗██╗██████╗ ██╗███╗   ███╗      ██╗    ██╗ █████╗ 
+ ██║ ██╔╝██║██╔══██╗██║████╗ ████║      ██║    ██║██╔══██╗
+ █████╔╝ ██║██████╔╝██║██╔████╔██║      ██║ █╗ ██║███████║
+ ██╔═██╗ ██║██╔══██╗██║██║╚██╔╝██║      ██║███╗██║██╔══██║
+ ██║  ██╗██║██║  ██║██║██║ ╚═╝ ██║      ╚███╔███╔╝██║  ██║
+ ╚═╝  ╚═╝╚═╝╚═╝  ╚═╝╚═╝╚═╝     ╚═╝       ╚══╝╚══╝ ╚═╝  ╚═╝`
+  },
+  'nusakit':{
+    name:'nusakit',desc:'NPM toolkit for Indonesian data validation — validate NIK, NPWP, NBP, and other Indonesian identity numbers. Zero dependencies, tree-shakeable, TypeScript.',
+    stack:['TypeScript','NPM','Node.js','Jest'],
+    link:'https://www.npmjs.com/package/nusakit',ascii:`
+ ███╗   ██╗██╗   ██╗███████╗ █████╗ ██╗  ██╗██╗████████╗
+ ████╗  ██║██║   ██║██╔════╝██╔══██╗██║ ██╔╝██║╚══██╔══╝
+ ██╔██╗ ██║██║   ██║███████╗███████║█████╔╝ ██║   ██║   
+ ██║╚██╗██║██║   ██║╚════██║██╔══██║██╔═██╗ ██║   ██║   
+ ██║ ╚████║╚██████╔╝███████║██║  ██║██║  ██╗██║   ██║   
+ ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝   ╚═╝   `
   }
 };
 
@@ -325,10 +325,10 @@ const cmds={
   },
   about:async()=>{
     printRaw('');
-    await typePrint('Muhammad Fauzi Azhar — Software Engineer with 3 years of experience building web applications.');
-    await typePrint('Passionate about system design, DevOps, and exploring API paradigms beyond CRUD.');
-    await typePrint('Currently exploring AI integration in software development.');
-    await typePrint('Based in Indonesia. Loves building tools that solve real problems.');
+    await typePrint('Muhammad Fauzi Azhar — Full-stack engineer who treats shipping as part of the craft.');
+    await typePrint('Specializes in turning business problems into working software for Indonesian SMEs.');
+    await typePrint('Leaning into AI-assisted products: review tools, copilots, decision-support systems.');
+    await typePrint('Software Engineer at Erasys Consulting since Jan 2023. Based in Yogyakarta, Indonesia.');
     printRaw('');
     print('<span class="dim">→</span> <a href="https://fauzi.tech" target="_blank">fauzi.tech</a>');
     printRaw('');
@@ -337,10 +337,10 @@ const cmds={
     printRaw('');
     print('<span class="cyan">┌──────────── TECH STACK ────────────┐</span>');
     const skills=[
-      ['Frontend','Next.js, React, TypeScript, Tailwind'],
-      ['Backend','Node.js, PostgreSQL, Prisma'],
-      ['DevOps','Docker, AWS, Linux, Git'],
-      ['Exploring','AI Integration, System Design']
+      ['Frontend','Next.js, React, TypeScript, Tailwind CSS, JavaScript, HTML/CSS'],
+      ['Backend','Node.js, Python, PostgreSQL, Prisma, FastAPI, Redis'],
+      ['AI/Auto','OpenAI API, RAG, Agent Architecture, n8n'],
+      ['DevOps','Docker, AWS, Git, Linux, Vercel, CI/CD']
     ];
     skills.forEach(([cat,list])=>{
       print(`  <span class="cyan">${cat.padEnd(12)}</span> <span class="green">${list}</span>`);
@@ -367,14 +367,14 @@ const cmds={
     printRaw('');
     print('<span class="cyan">┌──────────── CAREER TIMELINE ───────┐</span>');
     printRaw('');
-    await typePrint('  [<span class="green">2024-present</span>] Software Engineer');
-    print('               <span class="dim">Building SaaS products & AI-powered tools</span>');
+    await typePrint('  [<span class="green">2023-present</span>] Software Engineer');
+    print('               <span class="dim">Erasys Consulting, Yogyakarta (~3.5 years)</span>');
     await sleep(200);
-    await typePrint('  [<span class="green">2023-2024</span>  ] Full-Stack Developer');
-    print('               <span class="dim">Web apps for enterprise clients</span>');
+    await typePrint('  [<span class="green">2022</span>        ] Web Developer Intern');
+    print('               <span class="dim">Solve Education, Bandung (4 months)</span>');
     await sleep(200);
-    await typePrint('  [<span class="green">2022-2023</span>  ] Junior Developer');
-    print('               <span class="dim">Started the journey with Next.js & React</span>');
+    await typePrint('  [<span class="green">2022</span>        ] IT Trainee Intern');
+    print('               <span class="dim">Tradeasia International, Jakarta (2 months)</span>');
     printRaw('');
     print('<span class="cyan">└────────────────────────────────────┘</span>');
     printRaw('');
@@ -383,7 +383,7 @@ const cmds={
     printRaw('');
     print('<span class="cyan">┌──────────── CERTIFICATIONS ────────┐</span>');
     printRaw('');
-    ['AWS Cloud Practitioner Essentials','Web Development (Dicoding)','Python (HackerRank)','JavaScript (HackerRank)','SQL (HackerRank)'].forEach(c=>{
+    ['Meta Front-End Developer (Coursera, 2024)','AWS Certified Developer \u2013 Associate Badge (Credly, 2022)','AWS Cloud Developing (AWS Academy, 2022)','Bootcamp Frontend Developer NextJS (Sanbercode, 2022)','Bootcamp Frontend Developer ReactJS (Sanbercode, 2022)','React Web Developer Expert (Dicoding, 2022)','Intermediate JavaScript (Progate, 2022)','NodeJS Web Development (Progate, 2021)'].forEach(c=>{
       print(`  <span class="cyan">✦</span> ${c}`);
     });
     printRaw('');
