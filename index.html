@@ -149,12 +149,30 @@ function printAscii(text,colorClass='cyan'){
 
 async function typePrint(text,speed=12){
   typing=true;
+  const hasHTML=/<[a-z]/.test(text);
   const d=document.createElement('div');d.className='line fade-in';
   output.appendChild(d);
-  for(let i=0;i<text.length;i++){
-    d.innerHTML=esc(text.substring(0,i+1));
-    output.scrollTop=output.scrollHeight;
-    await sleep(speed);
+  if(hasHTML){
+    // Render HTML progressively by revealing characters
+    const tmp=document.createElement('div');tmp.innerHTML=text;
+    const plain=tmp.textContent;
+    for(let i=0;i<=plain.length;i++){
+      // Find how many raw HTML chars correspond to i plain chars
+      let rawIdx=0,plainCount=0;
+      while(rawIdx<text.length && plainCount<i){
+        if(text[rawIdx]==='<'){while(rawIdx<text.length && text[rawIdx-1]!=='>')rawIdx++;}
+        else{plainCount++;rawIdx++;}
+      }
+      d.innerHTML=text.substring(0,rawIdx);
+      output.scrollTop=output.scrollHeight;
+      await sleep(speed);
+    }
+  }else{
+    for(let i=0;i<text.length;i++){
+      d.innerHTML=esc(text.substring(0,i+1));
+      output.scrollTop=output.scrollHeight;
+      await sleep(speed);
+    }
   }
   typing=false;
 }
@@ -527,20 +545,12 @@ async function boot(){
   input.disabled=true;
   const isMobile=window.matchMedia('(max-width:768px)').matches;
   if(!isMobile){
-    const ascii=`
- ███╗   ███╗███████╗██╗  ██╗ █████╗ ███╗   ███╗██╗   ██╗██████╗ 
- ████╗ ████║██╔════╝██║  ██║██╔══██╗████╗ ████║██║   ██║██╔══██╗
- ██╔████╔██║███████╗███████║███████║██╔████╔██║██║   ██║██║  ██║
- ██║╚██╔╝██║╚════██║██╔══██║██╔══██║██║╚██╔╝██║██║   ██║██║  ██║
- ██║ ╚═╝ ██║███████║██║  ██║██║  ██║██║ ╚═╝ ██║╚██████╔╝██████╔╝
- ╚═╝     ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝ ╚═════╝ ╚═════╝
-                      █████╗ ███████╗██╗  ██╗ █████╗ ██████╗ 
-                     ██╔══██╗╚══███╔╝██║  ██║██╔══██╗██╔══██╗
-                     ███████║  ███╔╝ ███████║███████║██████╔╝
-                     ██╔══██║ ███╔╝  ██╔══██║██╔══██║██╔══██╗
-                     ██║  ██║███████╗██║  ██║██║  ██║██║  ██║
-                     ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝`;
-    printAscii(ascii);
+    print('<span class="cyan"> ███╗   ███╗██╗  ██╗███████╗ █████╗ ██╗   ██╗███████╗██╗ █████╗ ███████╗██╗  ██╗ █████╗ ██████╗ </span>');
+    print('<span class="cyan"> ████╗ ████║██║  ██║██╔════╝██╔══██╗██║   ██║╚══███╔╝██║██╔══██╗██╔════╝██║  ██║██╔══██╗██╔══██╗</span>');
+    print('<span class="cyan"> ██╔████╔██║███████║████╗   ███████║██║   ██║  ███╔╝ ██║███████║███████╗███████║███████║██████╔╝</span>');
+    print('<span class="cyan"> ██║╚██╔╝██║██╔══██║██╔══╝  ██╔══██║╚██╗ ██╔╝ ███╔╝  ██║██╔══██║╚════██║██╔══██║██╔══██║██╔══██╗</span>');
+    print('<span class="cyan"> ██║ ╚═╝ ██║██║  ██║██║     ██║  ██║ ╚████╔╝ ███████╗██║██║  ██║███████║██║  ██║██║  ██║██║  ██║</span>');
+    print('<span class="cyan"> ╚═╝     ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝  ╚═╝  ╚═══╝  ╚══════╝╚═╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝</span>');
     printRaw('');
   }
   const bootLines=[
