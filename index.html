@@ -131,7 +131,9 @@ function print(html,cls=''){
 function printRaw(text,cls=''){print(esc(text),cls);}
 function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
-// Print ASCII art with horizontal scroll support on mobile
+function isMobile(){return window.matchMedia('(max-width:768px)').matches;}
+
+// Print ASCII art with horizontal scroll
 function printAscii(text,colorClass='cyan'){
   const wrapper=document.createElement('div');
   wrapper.className='ascii-art';
@@ -145,6 +147,16 @@ function printAscii(text,colorClass='cyan'){
   }
   output.appendChild(wrapper);
   output.scrollTop=output.scrollHeight;
+}
+
+// Print project title: ASCII art on desktop, compact text on mobile
+function printProjectTitle(name){
+  if(isMobile()){
+    print(`<span class="cyan">▶ ${name.toUpperCase()}</span>`);
+  }else{
+    const p=projects[name];
+    if(p&&p.ascii)printAscii(p.ascii);
+  }
 }
 
 async function typePrint(text,speed=12){
@@ -402,22 +414,37 @@ const cmds={
   clear:()=>{output.innerHTML='';},
   'sudo hire-me':()=>{
     printRaw('');
-    print('<span class="green">  ╔══════════════════════════════════════════════╗</span>');
-    print('<span class="green">  ║                                              ║</span>');
-    print('<span class="green">  ║   🎉  YOU FOUND THE SECRET COMMAND!  🎉     ║</span>');
-    print('<span class="green">  ║                                              ║</span>');
-    print('<span class="green">  ║      ██████╗ ██╗   ██╗██████╗ ██╗            ║</span>');
-    print('<span class="green">  ║      ██╔══██╗██║   ██║██╔══██╗██║            ║</span>');
-    print('<span class="green">  ║      ██║  ██║██║   ██║██║  ██║██║            ║</span>');
-    print('<span class="green">  ║      ██║  ██║██║   ██║██║  ██║╚═╝            ║</span>');
-    print('<span class="green">  ║      ██████╔╝╚██████╔╝██████╔╝██╗            ║</span>');
-    print('<span class="green">  ║      ╚═════╝  ╚═════╝ ╚═════╝ ╚═╝            ║</span>');
-    print('<span class="green">  ║                                              ║</span>');
-    print('<span class="green">  ║   💼 Contact him now!                        ║</span>');
-    print('<span class="green">  ║   📧 hello@fauzi.tech                        ║</span>');
-    print('<span class="green">  ║   🌐 fauzi.tech                              ║</span>');
-    print('<span class="green">  ║                                              ║</span>');
-    print('<span class="green">  ╚══════════════════════════════════════════════╝</span>');
+    if(isMobile()){
+      print('<span class="green">  🎉 SECRET COMMAND FOUND! 🎉</span>');
+      printRaw('');
+      print('<span class="green">  ██╗  ██╗██╗██████╗ ███████╗██████╗ </span>');
+      print('<span class="green">  ██║  ██║██║██╔══██╗██╔════╝██╔══██╗</span>');
+      print('<span class="green">  ███████║██║██████╔╝█████╗  ██║  ██║</span>');
+      print('<span class="green">  ██╔══██║██║██╔═══╝ ██╔══╝  ██║  ██║</span>');
+      print('<span class="green">  ██║  ██║██║██║     ███████╗██████╔╝</span>');
+      print('<span class="green">  ╚═╝  ╚═╝╚═╝╚═╝     ╚══════╝╚═════╝ </span>');
+      printRaw('');
+      print('<span class="green">  💼 Contact him now!</span>');
+      print('<span class="green">  📧 hello@fauzi.tech</span>');
+      print('<span class="green">  🌐 fauzi.tech</span>');
+    }else{
+      print('<span class="green">  ╔══════════════════════════════════════════════╗</span>');
+      print('<span class="green">  ║                                              ║</span>');
+      print('<span class="green">  ║   🎉  YOU FOUND THE SECRET COMMAND!  🎉     ║</span>');
+      print('<span class="green">  ║                                              ║</span>');
+      print('<span class="green">  ║      ██████╗ ██╗   ██╗██████╗ ██╗            ║</span>');
+      print('<span class="green">  ║      ██╔══██╗██║   ██║██╔══██╗██║            ║</span>');
+      print('<span class="green">  ║      ██║  ██║██║   ██║██║  ██║██║            ║</span>');
+      print('<span class="green">  ║      ██║  ██║██║   ██║██║  ██║╚═╝            ║</span>');
+      print('<span class="green">  ║      ██████╔╝╚██████╔╝██████╔╝██╗            ║</span>');
+      print('<span class="green">  ║      ╚═════╝  ╚═════╝ ╚═════╝ ╚═╝            ║</span>');
+      print('<span class="green">  ║                                              ║</span>');
+      print('<span class="green">  ║   💼 Contact him now!                        ║</span>');
+      print('<span class="green">  ║   📧 hello@fauzi.tech                        ║</span>');
+      print('<span class="green">  ║   🌐 fauzi.tech                              ║</span>');
+      print('<span class="green">  ║                                              ║</span>');
+      print('<span class="green">  ╚══════════════════════════════════════════════╝</span>');
+    }
     printRaw('');
   },
   matrix:()=>{
@@ -469,9 +496,9 @@ function openProject(name){
     return;
   }
   printRaw('');
-  printAscii(p.ascii);
+  printProjectTitle(name);
   printRaw('');
-  print(`<span class="dim">${'─'.repeat(40)}</span>`);
+  print(`<span class="dim">${'─'.repeat(isMobile()?30:40)}</span>`);
   printRaw('');
   print(`  <span class="cyan">Project:</span> ${p.name}`);
   printRaw('');
@@ -484,7 +511,7 @@ function openProject(name){
   printRaw('');
   print(`  <span class="cyan">Link:</span> <a href="${p.link}" target="_blank">${p.link}</a>`);
   printRaw('');
-  print(`<span class="dim">${'─'.repeat(40)}</span>`);
+  print(`<span class="dim">${'─'.repeat(isMobile()?30:40)}</span>`);
   printRaw('');
 }
 
@@ -533,8 +560,7 @@ input.addEventListener('keydown',e=>{
 // Focus input on tap, but not when selecting text
 document.addEventListener('click',(e)=>{
   if(!typing && !window.getSelection().toString()){
-    const isMobile=window.matchMedia('(max-width:768px)').matches;
-    if(!isMobile || e.target.closest('#input-area') || e.target.closest('#mobile-cmds')){
+    if(!isMobile() || e.target.closest('#input-area') || e.target.closest('#mobile-cmds')){
       input.focus();
     }
   }
@@ -543,8 +569,7 @@ document.addEventListener('click',(e)=>{
 // BOOT SEQUENCE
 async function boot(){
   input.disabled=true;
-  const isMobile=window.matchMedia('(max-width:768px)').matches;
-  if(!isMobile){
+  if(!isMobile()){
     print('<span class="cyan"> ███╗   ███╗██╗  ██╗███████╗ █████╗ ██╗   ██╗███████╗██╗ █████╗ ███████╗██╗  ██╗ █████╗ ██████╗ </span>');
     print('<span class="cyan"> ████╗ ████║██║  ██║██╔════╝██╔══██╗██║   ██║╚══███╔╝██║██╔══██╗██╔════╝██║  ██║██╔══██╗██╔══██╗</span>');
     print('<span class="cyan"> ██╔████╔██║███████║████╗   ███████║██║   ██║  ███╔╝ ██║███████║███████╗███████║███████║██████╔╝</span>');
